@@ -1,0 +1,95 @@
+/* X中文帖子过滤器样式 */
+
+/* 隐藏状态的帖子 */
+.chinese-filter-hidden {
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+    transition: all 0.3s ease-out !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* 正在移除的帖子动画 */
+.chinese-filter-removing {
+    opacity: 0.3 !important;
+    transform: scale(0.95) !important;
+    transition: all 0.5s ease-out !important;
+    border: 2px solid #ff4444 !important;
+    background: linear-gradient(45deg, rgba(255, 68, 68, 0.1), transparent) !important;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3) !important;
+}
+
+/* 通知样式 */
+.chinese-filter-notification {
+    position: fixed !important;
+    top: 80px !important;
+    right: 20px !important;
+    background: linear-gradient(135deg, #1da1f2, #0084b4) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    z-index: 10000 !important;
+    box-shadow: 0 4px 15px rgba(29, 161, 242, 0.3) !important;
+    animation: slideIn 0.3s ease-out, slideOut 0.3s ease-in 2.7s forwards !important;
+    backdrop-filter: blur(10px) !important;
+    min-width: 200px !important;
+    text-align: center !important;
+}
+
+/* 广告通知的不同颜色 */
+.chinese-filter-notification.ad-notification {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3) !important;
+}
+
+/* 动画关键帧 */
+@keyframes slideIn {
+    from { 
+        transform: translateX(100%); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideOut {
+    from { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateX(100%); 
+        opacity: 0; 
+    }
+}
+
+/* 防止被其他样式覆盖 */
+.chinese-filter-hidden * {
+    display: none !important;
+}
+
+/* 确保过滤器状态可见性 */
+.chinese-filter-processed {
+    position: relative;
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+    .chinese-filter-notification {
+        background: linear-gradient(135deg, #1a91da, #0070f3) !important;
+        box-shadow: 0 4px 15px rgba(26, 145, 218, 0.4) !important;
+    }
+    
+    .chinese-filter-notification.ad-notification {
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4) !important;
+    }
+} 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X中文帖子过滤器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 320px;
+            min-height: 400px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .stats {
+            padding: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .stat-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .stat-value {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .controls {
+            padding: 0 20px 20px;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: #4CAF50;
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active .toggle-knob {
+            transform: translateX(26px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 X中文帖子过滤器</h1>
+        <p><span class="status-indicator"></span>运行中</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🇨🇳</span>
+                已隐藏中文帖子
+            </div>
+            <div class="stat-value" id="chineseCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🚫</span>
+                已屏蔽广告
+            </div>
+            <div class="stat-value" id="adCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">⚡</span>
+                插件状态
+            </div>
+            <div class="stat-value" id="status">活跃</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="toggle-container">
+            <span class="toggle-label">视觉效果</span>
+            <div class="toggle active" id="visualToggle">
+                <div class="toggle-knob"></div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn" id="refreshBtn">🔄 刷新</button>
+            <button class="btn" id="resetBtn">🗑️ 重置</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        让您的X时间线更清爽 · v1.0
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html> 
