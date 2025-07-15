@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成符合Chrome商店规范的128x128图标</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .icon-display {
+            display: inline-block;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        canvas {
+            border: 1px solid #ddd;
+        }
+        .download-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .download-btn:hover {
+            background: #3367d6;
+        }
+        .requirements {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .requirements h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .requirements ul {
+            margin: 10px 0;
+        }
+        .requirements li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Chrome商店规范图标生成器</h1>
+        
+        <div class="icon-container">
+            <h3>128×128像素商店图标（符合官方规范）</h3>
+            <div class="icon-display">
+                <canvas id="iconCanvas" width="128" height="128"></canvas>
+            </div>
+            <button class="download-btn" onclick="downloadIcon()">下载PNG图标</button>
+            <p><strong>文件名：</strong>icon-128.png</p>
+        </div>
+
+        <div class="requirements">
+            <h3>✅ 符合的Chrome商店规范</h3>
+            <ul>
+                <li><strong>尺寸：</strong>精确的128×128像素</li>
+                <li><strong>格式：</strong>PNG格式，无压缩损失</li>
+                <li><strong>内容尺寸：</strong>96×96像素图标 + 16像素透明边距</li>
+                <li><strong>背景适配：</strong>在亮色和暗色背景下都清晰可见</li>
+                <li><strong>设计规范：</strong>正面朝向，无透视变形</li>
+                <li><strong>文件大小：</strong>优化的文件大小，避免处理错误</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function createIcon() {
+            const canvas = document.getElementById('iconCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置画布大小为128x128
+            canvas.width = 128;
+            canvas.height = 128;
+            
+            // 清除画布
+            ctx.clearRect(0, 0, 128, 128);
+            
+            // 1. 绘制黑色圆角背景 (96x96实际内容 + 16像素边距)
+            const cornerRadius = 15;
+            const iconSize = 96;
+            const offset = (128 - iconSize) / 2; // 16像素边距
+            
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.roundRect(offset, offset, iconSize, iconSize, cornerRadius);
+            ctx.fill();
+            
+            // 2. 绘制白色X标志（在中心，适当缩放）
+            const centerX = 64;
+            const centerY = 64;
+            const xSize = 16; // X的半长度
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            // 左上到右下的线
+            ctx.moveTo(centerX - xSize, centerY - xSize);
+            ctx.lineTo(centerX + xSize, centerY + xSize);
+            // 右上到左下的线
+            ctx.moveTo(centerX + xSize, centerY - xSize);
+            ctx.lineTo(centerX - xSize, centerY + xSize);
+            ctx.stroke();
+            
+            // 3. 绘制右下角中文标识
+            const chineseBoxSize = 26;
+            const chineseX = offset + iconSize - chineseBoxSize - 4;
+            const chineseY = offset + iconSize - chineseBoxSize - 4;
+            
+            // 白色背景方框
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(chineseX, chineseY, chineseBoxSize, chineseBoxSize, 4);
+            ctx.fill();
+            
+            // 中文字符
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('中', chineseX + chineseBoxSize/2, chineseY + chineseBoxSize/2);
+            
+            // 4. 绘制左上角过滤标识（红色圆点）
+            const filterX = offset + 12;
+            const filterY = offset + 12;
+            const filterRadius = 8;
+            
+            // 红色圆圈
+            ctx.fillStyle = '#ff4444';
+            ctx.beginPath();
+            ctx.arc(filterX, filterY, filterRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // 白色斜线（过滤标识）
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(filterX - 4, filterY - 4);
+            ctx.lineTo(filterX + 4, filterY + 4);
+            ctx.stroke();
+        }
+        
+        function downloadIcon() {
+            const canvas = document.getElementById('iconCanvas');
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = 'icon-128.png';
+            link.href = canvas.toDataURL('image/png');
+            
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 页面加载时生成图标
+        window.onload = function() {
+            createIcon();
+        };
+    </script>
+</body>
+</html> 
