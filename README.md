@@ -1,0 +1,2 @@
+# block_chinese_twitterX_chrome_extension
+chrome_extension for：block chinese twitter
