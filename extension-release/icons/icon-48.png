@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!-- saved from url=(0082)file:///D:/dRepo/block_chinese_twitterX_chrome_extension/icons/generate-icons.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成扩展图标</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .icon-item h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        .icon-display {
+            display: inline-block;
+            margin: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .instructions ol {
+            margin: 10px 0;
+        }
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 X中文过滤器扩展图标生成器</h1>
+        
+        <div class="icon-grid">
+            <div class="icon-item">
+                <h3>128×128 (商店图标)</h3>
+                <div class="icon-display">
+                    <svg width="128" height="128" viewBox="0 0 128 128">
+                        <rect x="0" y="0" width="128" height="128" rx="20" ry="20" fill="#000000"></rect>
+                        <g transform="translate(64, 64)">
+                            <path d="M-22 -22 L22 22 M22 -22 L-22 22" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                        <rect x="85" y="85" width="35" height="35" rx="6" ry="6" fill="#ffffff"></rect>
+                        <text x="102.5" y="107" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#000000">中</text>
+                        <circle cx="25" cy="25" r="12" fill="#ff4444"></circle>
+                        <path d="M20 20 L30 30" stroke="white" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <p>右键保存为: <strong>icon-128.png</strong></p>
+            </div>
+
+            <div class="icon-item">
+                <h3>48×48 (管理页面)</h3>
+                <div class="icon-display">
+                    <svg width="48" height="48" viewBox="0 0 128 128">
+                        <rect x="0" y="0" width="128" height="128" rx="20" ry="20" fill="#000000"></rect>
+                        <g transform="translate(64, 64)">
+                            <path d="M-22 -22 L22 22 M22 -22 L-22 22" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                        <rect x="85" y="85" width="35" height="35" rx="6" ry="6" fill="#ffffff"></rect>
+                        <text x="102.5" y="107" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#000000">中</text>
+                        <circle cx="25" cy="25" r="12" fill="#ff4444"></circle>
+                        <path d="M20 20 L30 30" stroke="white" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <p>右键保存为: <strong>icon-48.png</strong></p>
+            </div>
+
+            <div class="icon-item">
+                <h3>32×32 (Windows需要)</h3>
+                <div class="icon-display">
+                    <svg width="32" height="32" viewBox="0 0 128 128">
+                        <rect x="0" y="0" width="128" height="128" rx="20" ry="20" fill="#000000"></rect>
+                        <g transform="translate(64, 64)">
+                            <path d="M-22 -22 L22 22 M22 -22 L-22 22" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                        <rect x="85" y="85" width="35" height="35" rx="6" ry="6" fill="#ffffff"></rect>
+                        <text x="102.5" y="107" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#000000">中</text>
+                        <circle cx="25" cy="25" r="12" fill="#ff4444"></circle>
+                        <path d="M20 20 L30 30" stroke="white" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <p>右键保存为: <strong>icon-32.png</strong></p>
+            </div>
+
+            <div class="icon-item">
+                <h3>16×16 (工具栏)</h3>
+                <div class="icon-display">
+                    <svg width="16" height="16" viewBox="0 0 128 128">
+                        <rect x="0" y="0" width="128" height="128" rx="20" ry="20" fill="#000000"></rect>
+                        <g transform="translate(64, 64)">
+                            <path d="M-22 -22 L22 22 M22 -22 L-22 22" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                        <rect x="85" y="85" width="35" height="35" rx="6" ry="6" fill="#ffffff"></rect>
+                        <text x="102.5" y="107" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#000000">中</text>
+                        <circle cx="25" cy="25" r="12" fill="#ff4444"></circle>
+                        <path d="M20 20 L30 30" stroke="white" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <p>右键保存为: <strong>icon-16.png</strong></p>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📝 使用说明</h3>
+            <ol>
+                <li><strong>右键点击</strong>上面的图标</li>
+                <li>选择<strong>"图片另存为"</strong>或<strong>"Save image as"</strong></li>
+                <li>将文件名改为对应的名称（如 icon-128.png）</li>
+                <li>选择<strong>PNG格式</strong>保存</li>
+                <li>将所有PNG文件保存到<strong>icons/</strong>文件夹中</li>
+                <li>完成后删除这个HTML文件</li>
+            </ol>
+            <p><strong>💡 提示：</strong>确保所有图标都保存为PNG格式，文件名要与manifest.json中的配置一致。</p>
+        </div>
+    </div>
+
+ </body></html>
