@@ -1,4 +1,4 @@
-// X中文帖子过滤器 - Popup Script
+// X中文帖子过滤器 - Popup Script (增强版)
 (function() {
     'use strict';
 
@@ -47,6 +47,21 @@
         }
     }
 
+    // 获取实时统计数据
+    async function getRealTimeStats() {
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab && (tab.url.includes('twitter.com') || tab.url.includes('x.com'))) {
+                const response = await chrome.tabs.sendMessage(tab.id, { type: 'getStats' });
+                return response;
+            }
+        } catch (error) {
+            // 如果content script没有响应，返回null
+            return null;
+        }
+        return null;
+    }
+
     // 更新统计数据
     async function updateStats() {
         try {
@@ -59,26 +74,36 @@
                 return;
             }
 
-            // 检查插件是否在运行
+            // 首先尝试从content script获取实时数据
+            const realTimeStats = await getRealTimeStats();
+            
+            // 获取存储的统计数据作为备份
             const result = await chrome.storage.sync.get([
                 STORAGE_KEYS.CHINESE_COUNT,
                 STORAGE_KEYS.AD_COUNT,
                 STORAGE_KEYS.LAST_ACTIVE
             ]);
 
-            chineseCountEl.textContent = result[STORAGE_KEYS.CHINESE_COUNT] || 0;
-            adCountEl.textContent = result[STORAGE_KEYS.AD_COUNT] || 0;
+            // 使用实时数据或存储数据
+            const chineseCount = realTimeStats?.hiddenCount ?? result[STORAGE_KEYS.CHINESE_COUNT] ?? 0;
+            const adCount = realTimeStats?.adCount ?? result[STORAGE_KEYS.AD_COUNT] ?? 0;
+            
+            chineseCountEl.textContent = chineseCount;
+            adCountEl.textContent = adCount;
 
             // 检查最后活动时间
             const lastActive = result[STORAGE_KEYS.LAST_ACTIVE];
             const now = Date.now();
             
-            if (lastActive && (now - lastActive) < 10000) { // 10秒内有活动
+            if (realTimeStats) {
                 statusEl.textContent = '活跃';
                 statusEl.style.background = 'rgba(76, 175, 80, 0.8)';
-            } else {
+            } else if (lastActive && (now - lastActive) < 15000) { // 15秒内有活动
                 statusEl.textContent = '待机';
                 statusEl.style.background = 'rgba(255, 193, 7, 0.8)';
+            } else {
+                statusEl.textContent = '离线';
+                statusEl.style.background = 'rgba(156, 156, 156, 0.8)';
             }
 
         } catch (error) {
@@ -103,10 +128,15 @@
                 // 通知content script更新设置
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
                 if (tab && (tab.url.includes('twitter.com') || tab.url.includes('x.com'))) {
-                    await chrome.tabs.sendMessage(tab.id, {
-                        type: 'updateSettings',
-                        visualEffects: isActive
-                    });
+                    try {
+                        await chrome.tabs.sendMessage(tab.id, {
+                            type: 'updateSettings',
+                            visualEffects: isActive
+                        });
+                    } catch (error) {
+                        // content script可能还没加载，忽略错误
+                        console.log('Content script未响应，设置已保存');
+                    }
                 }
             } catch (error) {
                 console.error('保存设置失败:', error);
@@ -116,11 +146,28 @@
         // 刷新按钮
         refreshBtn.addEventListener('click', async () => {
             try {
+                refreshBtn.style.transform = 'rotate(360deg)';
+                refreshBtn.style.transition = 'transform 0.6s ease';
+                
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
                 if (tab && (tab.url.includes('twitter.com') || tab.url.includes('x.com'))) {
-                    await chrome.tabs.sendMessage(tab.id, { type: 'refresh' });
-                    await updateStats();
+                    try {
+                        await chrome.tabs.sendMessage(tab.id, { type: 'refresh' });
+                        await updateStats();
+                        
+                        // 显示成功反馈
+                        statusEl.textContent = '已刷新';
+                        statusEl.style.background = 'rgba(76, 175, 80, 0.8)';
+                    } catch (error) {
+                        statusEl.textContent = '刷新失败';
+                        statusEl.style.background = 'rgba(244, 67, 54, 0.8)';
+                    }
                 }
+                
+                setTimeout(() => {
+                    refreshBtn.style.transform = '';
+                    refreshBtn.style.transition = '';
+                }, 600);
             } catch (error) {
                 console.error('刷新失败:', error);
             }
@@ -128,7 +175,7 @@
 
         // 重置按钮
         resetBtn.addEventListener('click', async () => {
-            if (confirm('确定要重置所有统计数据吗？')) {
+            if (confirm('确定要重置所有统计数据并恢复隐藏的推文吗？')) {
                 try {
                     await chrome.storage.sync.set({
                         [STORAGE_KEYS.CHINESE_COUNT]: 0,
@@ -141,7 +188,14 @@
                     // 通知content script重置
                     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
                     if (tab && (tab.url.includes('twitter.com') || tab.url.includes('x.com'))) {
-                        await chrome.tabs.sendMessage(tab.id, { type: 'reset' });
+                        try {
+                            await chrome.tabs.sendMessage(tab.id, { type: 'reset' });
+                            statusEl.textContent = '已重置';
+                            statusEl.style.background = 'rgba(76, 175, 80, 0.8)';
+                        } catch (error) {
+                            statusEl.textContent = '重置失败';
+                            statusEl.style.background = 'rgba(244, 67, 54, 0.8)';
+                        }
                     }
                 } catch (error) {
                     console.error('重置失败:', error);
