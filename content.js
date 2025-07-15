@@ -119,7 +119,11 @@
 
     // 检测是否包含中文
     function containsChinese(text) {
-        return CHINESE_REGEX.test(text);
+        const result = CHINESE_REGEX.test(text);
+        if (result) {
+            console.log('中文检测结果: true, 示例文字:', text.match(CHINESE_REGEX)?.[0]);
+        }
+        return result;
     }
 
     // 检测是否为广告
@@ -194,46 +198,63 @@
 
     // 隐藏元素
     function hideElement(element, reason = 'chinese') {
+        console.log('尝试隐藏元素，原因:', reason);
+        
         if (element.classList.contains('chinese-filter-hidden')) {
+            console.log('元素已经被隐藏，跳过');
             return;
         }
         
-        // 添加移除动画
-        element.classList.add('chinese-filter-removing');
+        console.log('开始隐藏元素');
+        
+        // 立即隐藏元素
+        element.style.display = 'none !important';
+        element.classList.add('chinese-filter-hidden');
+        
+        // 如果启用视觉效果，先显示动画再隐藏
+        if (CONFIG.enableVisualEffects) {
+            element.style.display = '';
+            element.classList.add('chinese-filter-removing');
+            
+            // 延迟添加隐藏类以显示动画效果
+            setTimeout(() => {
+                console.log('应用隐藏样式');
+                element.classList.remove('chinese-filter-removing');
+                element.classList.add('chinese-filter-hidden');
+            }, 500);
+        }
         
         const message = reason === 'ad' ? 
             `🚫 已屏蔽广告 (${++CONFIG.adCount})` : 
             `🇨🇳 已隐藏中文帖子 (${++CONFIG.hiddenCount})`;
             
+        console.log('显示通知:', message);
         showNotification(message, reason);
         
         // 保存统计数据
         saveStats();
-        
-        // 延迟添加隐藏类以显示动画效果
-        setTimeout(() => {
-            element.classList.remove('chinese-filter-removing');
-            element.classList.add('chinese-filter-hidden');
-        }, 500);
     }
 
     // 获取帖子元素
     function getTweetElements() {
         const tweets = new Set();
         
+        // 主要选择器：查找所有推文容器
+        const tweetContainers = document.querySelectorAll('article[data-testid="tweet"]');
+        tweetContainers.forEach(tweet => tweets.add(tweet));
+        
+        // 备用选择器
         for (const selector of TWEET_SELECTORS) {
             const elements = document.querySelectorAll(selector);
             elements.forEach(el => tweets.add(el));
         }
         
-        // 也尝试通过更通用的方式找到帖子
+        // 通用方式：查找包含推文内容的article元素
         const articles = document.querySelectorAll('article');
         articles.forEach(article => {
-            // 检查是否看起来像推文
-            if (article.textContent && 
-                (article.querySelector('[data-testid]') || 
-                 article.querySelector('[role="link"]') ||
-                 article.textContent.length > 20)) {
+            if (article.getAttribute('data-testid') === 'tweet' || 
+                (article.textContent && article.textContent.length > 20 && 
+                 article.querySelector('[data-testid="tweetText"]'))) {
                 tweets.add(article);
             }
         });
@@ -244,27 +265,35 @@
     // 处理帖子
     function processTweets() {
         const tweets = getTweetElements();
+        console.log(`发现 ${tweets.length} 个帖子待处理`);
         
         tweets.forEach(tweet => {
-            // 跳过已处理的元素
-            if (tweet.classList.contains('chinese-filter-processed')) {
+            // 跳过已处理且已隐藏的元素
+            if (tweet.classList.contains('chinese-filter-processed') && 
+                tweet.classList.contains('chinese-filter-hidden')) {
                 return;
             }
             
-            tweet.classList.add('chinese-filter-processed');
-            
             const tweetText = tweet.textContent || '';
+            console.log('检查帖子:', tweetText.substring(0, 50) + '...');
             
             // 检查是否为广告
             if (isAd(tweet)) {
+                console.log('检测到广告，隐藏');
+                tweet.classList.add('chinese-filter-processed');
                 hideElement(tweet, 'ad');
                 return;
             }
             
             // 检查是否包含中文
             if (containsChinese(tweetText)) {
+                console.log('检测到中文帖子，隐藏:', tweetText.substring(0, 30));
+                tweet.classList.add('chinese-filter-processed');
                 hideElement(tweet, 'chinese');
                 return;
+            } else {
+                console.log('不包含中文，保留');
+                tweet.classList.add('chinese-filter-processed');
             }
         });
     }

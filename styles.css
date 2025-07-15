@@ -2,6 +2,7 @@
 
 /* 隐藏状态的帖子 */
 .chinese-filter-hidden {
+    display: none !important;
     opacity: 0 !important;
     transform: scale(0.8) !important;
     transition: all 0.3s ease-out !important;
@@ -11,6 +12,7 @@
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
+    visibility: hidden !important;
 }
 
 /* 正在移除的帖子动画 */
