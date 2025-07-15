@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome扩展截图剪裁工具</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .requirements {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .requirements h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #1976d2;
+        }
+        .upload-area.dragover {
+            border-color: #1976d2;
+            background-color: #f0f8ff;
+        }
+        #imageInput {
+            margin-bottom: 20px;
+        }
+        .canvas-container {
+            text-align: center;
+            margin: 30px 0;
+            display: none;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-width: 100%;
+            height: auto;
+        }
+        .controls {
+            display: none;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .size-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .size-option {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .size-option:hover {
+            border-color: #1976d2;
+            background: #f0f8ff;
+        }
+        .size-option.selected {
+            border-color: #1976d2;
+            background: #e3f2fd;
+        }
+        .crop-info {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .download-area {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 8px;
+        }
+        .image-preview {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 Chrome扩展截图剪裁工具</h1>
+        
+        <div class="requirements">
+            <h3>🎯 Chrome网上应用店截图要求</h3>
+            <ul>
+                <li><strong>尺寸</strong>：1280×800 或 640×400 像素</li>
+                <li><strong>格式</strong>：JPEG 或 24位PNG（无透明度）</li>
+                <li><strong>数量</strong>：最多5张，至少1张</li>
+                <li><strong>内容</strong>：展示扩展的主要功能和界面</li>
+            </ul>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <h3>📁 加载图片</h3>
+            <input type="file" id="imageInput" accept="image/*">
+            <p>选择图片文件，或将图片拖拽到此处</p>
+            <p><small>支持 PNG, JPEG, WebP 等格式</small></p>
+        </div>
+
+        <div class="image-preview" id="imagePreview">
+            <h3>原始图片预览</h3>
+            <img id="originalImage" alt="原始图片">
+        </div>
+
+        <div class="controls" id="controls">
+            <h3>🎨 选择输出尺寸</h3>
+            <div class="size-options">
+                <div class="size-option" data-width="1280" data-height="800">
+                    <h4>1280 × 800</h4>
+                    <p>标准尺寸（推荐）</p>
+                    <p>16:10 宽屏比例</p>
+                </div>
+                <div class="size-option" data-width="640" data-height="400">
+                    <h4>640 × 400</h4>
+                    <p>紧凑尺寸</p>
+                    <p>16:10 宽屏比例</p>
+                </div>
+            </div>
+            
+            <div class="crop-info" id="cropInfo">
+                <p>💡 <strong>提示</strong>：点击上方选择目标尺寸，工具会自动调整图片</p>
+            </div>
+            
+            <button id="cropButton" onclick="cropImage()" disabled>裁剪图片</button>
+            <button onclick="loadUIImage()">直接加载ui.png</button>
+        </div>
+
+        <div class="canvas-container" id="canvasContainer">
+            <h3>预览效果</h3>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="download-area" id="downloadArea">
+            <h3>✅ 剪裁完成！</h3>
+            <p>右键点击下面的图片，选择"图片另存为"保存</p>
+            <canvas id="resultCanvas"></canvas>
+            <br>
+            <button onclick="reset()">重新剪裁</button>
+        </div>
+    </div>
+
+    <script>
+        let originalImage = null;
+        let selectedWidth = 1280;
+        let selectedHeight = 800;
+
+        // 拖拽上传
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                loadImage(files[0]);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadImage(e.target.files[0]);
+            }
+        });
+
+        // 尺寸选择
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedWidth = parseInt(option.dataset.width);
+                selectedHeight = parseInt(option.dataset.height);
+                document.getElementById('cropButton').disabled = false;
+                updateCropInfo();
+            });
+        });
+
+        // 默认选择1280x800
+        document.querySelector('.size-option[data-width="1280"]').click();
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    document.getElementById('originalImage').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('controls').style.display = 'block';
+                    updateCropInfo();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadUIImage() {
+            // 直接加载ui.png文件
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                document.getElementById('originalImage').src = 'ui.png';
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('controls').style.display = 'block';
+                updateCropInfo();
+            };
+            img.src = 'ui.png';
+        }
+
+        function updateCropInfo() {
+            if (!originalImage) return;
+            
+            const info = document.getElementById('cropInfo');
+            const originalRatio = originalImage.width / originalImage.height;
+            const targetRatio = selectedWidth / selectedHeight;
+            
+            let cropMethod = '';
+            if (Math.abs(originalRatio - targetRatio) < 0.01) {
+                cropMethod = '✅ 比例完美匹配，直接缩放';
+            } else if (originalRatio > targetRatio) {
+                cropMethod = '✂️ 将裁剪左右边缘（保持高度）';
+            } else {
+                cropMethod = '✂️ 将裁剪上下边缘（保持宽度）';
+            }
+            
+            info.innerHTML = `
+                <p><strong>原图尺寸</strong>：${originalImage.width} × ${originalImage.height}</p>
+                <p><strong>目标尺寸</strong>：${selectedWidth} × ${selectedHeight}</p>
+                <p><strong>处理方式</strong>：${cropMethod}</p>
+            `;
+        }
+
+        function cropImage() {
+            if (!originalImage) return;
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = selectedWidth;
+            canvas.height = selectedHeight;
+
+            // 计算缩放和裁剪
+            const sourceRatio = originalImage.width / originalImage.height;
+            const targetRatio = selectedWidth / selectedHeight;
+
+            let sx, sy, sWidth, sHeight;
+            
+            if (sourceRatio > targetRatio) {
+                // 原图更宽，裁剪宽度
+                sHeight = originalImage.height;
+                sWidth = sHeight * targetRatio;
+                sx = (originalImage.width - sWidth) / 2;
+                sy = 0;
+            } else {
+                // 原图更高，裁剪高度
+                sWidth = originalImage.width;
+                sHeight = sWidth / targetRatio;
+                sx = 0;
+                sy = (originalImage.height - sHeight) / 2;
+            }
+
+            // 绘制裁剪后的图像
+            ctx.drawImage(originalImage, sx, sy, sWidth, sHeight, 0, 0, selectedWidth, selectedHeight);
+
+            // 显示结果
+            document.getElementById('canvasContainer').style.display = 'block';
+            
+            // 创建下载用的canvas
+            const resultCanvas = document.getElementById('resultCanvas');
+            const resultCtx = resultCanvas.getContext('2d');
+            resultCanvas.width = selectedWidth;
+            resultCanvas.height = selectedHeight;
+            resultCtx.drawImage(canvas, 0, 0);
+            
+            document.getElementById('downloadArea').style.display = 'block';
+            
+            // 滚动到结果区域
+            document.getElementById('downloadArea').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function reset() {
+            document.getElementById('canvasContainer').style.display = 'none';
+            document.getElementById('downloadArea').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('controls').style.display = 'none';
+            originalImage = null;
+            imageInput.value = '';
+        }
+
+        // 页面加载完成后自动加载ui.png
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadUIImage();
+            }, 500);
+        });
+    </script>
+</body>
+</html> 
